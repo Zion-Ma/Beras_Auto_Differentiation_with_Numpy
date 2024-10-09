@@ -53,4 +53,8 @@ class Dense(Diffable):
             "kaiming",
         ), f"Unknown dense weight initialization strategy '{initializer}' requested"
 
-        return NotImplementedError
+        # Change these!
+        weights = None
+        biases = None
+        
+        return weights, biases
