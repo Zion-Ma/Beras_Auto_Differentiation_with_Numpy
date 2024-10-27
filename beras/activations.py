@@ -91,10 +91,9 @@ class Softmax(Activation):
         x, y = self.inputs + self.outputs
         bn, n = x.shape
         grad = np.zeros(shape=(bn, n, n), dtype=x.dtype)
-        
         # TODO: Implement softmax gradient
         # raise NotImplementedError
-        for i in bn:
+        for i in range(bn):
             logit = x[i] - np.max(x[i])
             exp_logit = np.exp(logit)
             softmax_output = exp_logit / np.sum(exp_logit, axis=-1, keepdims=True)

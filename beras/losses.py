@@ -19,7 +19,7 @@ class MeanSquaredError(Loss):
         # return NotImplementedError
         self.y_pred = y_pred
         self.y_true = y_true
-        mse = np.mean(np.square(y_pred - y_true), axis=-1, keepdims=True)
+        mse = np.mean(np.mean(np.square(y_pred - y_true), axis=-1), keepdims=True)
         return Tensor(mse)
 
     def get_input_gradients(self) -> list[Tensor]:
@@ -38,7 +38,7 @@ class CategoricalCrossEntropy(Loss):
         y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
         self.y_true = y_true
         self.y_pred = y_pred
-        loss = np.mean(-np.sum(y_true * np.log(y_pred), axis=-1, keepdims=True), keepdims=True)
+        loss = np.mean(np.mean(-np.sum(y_true * np.log(y_pred), axis=-1), keepdims=True), keepdims=True)
         return Tensor(loss)
         
     def get_input_gradients(self):
