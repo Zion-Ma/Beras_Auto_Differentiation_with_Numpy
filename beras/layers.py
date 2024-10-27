@@ -65,7 +65,7 @@ class Dense(Diffable):
             biases = Variable(np.zeros(output_size))
         elif initializer == "xavier":
             limit = np.sqrt(2 / (input_size + output_size))
-            weights = Variable(np.random.uniform(-limit, limit, (input_size, output_size)))
+            weights = Variable(np.random.uniform(0, limit, (input_size, output_size)))
             biases = Variable(np.zeros(output_size))
         elif initializer == "kaiming":
             std = np.sqrt(2 / input_size)
