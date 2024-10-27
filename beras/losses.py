@@ -16,11 +16,22 @@ class Loss(Diffable):
 
 class MeanSquaredError(Loss):
     def forward(self, y_pred: Tensor, y_true: Tensor) -> Tensor:
-        # return NotImplementedError
+        # # return NotImplementedError
         self.y_pred = y_pred
         self.y_true = y_true
-        mse = np.mean(np.mean(np.square(y_pred - y_true), axis=-1), keepdims=True)
-        return Tensor(mse)
+                # Compute the squared difference
+        squared_diff = (y_pred - y_true) ** 2
+
+        # Take the mean across each example (axis=-1)
+        example_means = np.mean(squared_diff, axis=-1)
+
+        # Then take the mean across the batch
+        batch_mean = np.mean(example_means, keepdims=True)
+
+        return Tensor(batch_mean)
+        # # mse = np.mean(np.mean(np.square(y_pred - y_true), axis=-1), keepdims=True)
+        # mse = np.mean(np.square(y_pred-y_true), axis=0)
+        # return Tensor(mse)
 
     def get_input_gradients(self) -> list[Tensor]:
         # return NotImplementedError
