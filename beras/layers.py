@@ -27,7 +27,7 @@ class Dense(Diffable):
 
     def get_weight_gradients(self) -> list[Tensor]:
         # return NotImplementedError
-        return [self.inputs[0], Tensor(np.array([1 for _ in range(len(self.b))]))]
+        return [self.inputs[0].T, Tensor(np.ones_like(self.b).T)]
 
     @staticmethod
     def _initialize_weight(initializer, input_size, output_size) -> tuple[Variable, Variable]:
@@ -65,7 +65,7 @@ class Dense(Diffable):
             biases = Variable(np.zeros(output_size))
         elif initializer == "xavier":
             limit = np.sqrt(2 / (input_size + output_size))
-            weights = Variable(np.random.uniform(0, limit, (input_size, output_size)))
+            weights = Variable(np.random.normal(0, limit, (input_size, output_size)))
             biases = Variable(np.zeros(output_size))
         elif initializer == "kaiming":
             std = np.sqrt(2 / input_size)
