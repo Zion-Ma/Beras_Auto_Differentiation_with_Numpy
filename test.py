@@ -17,10 +17,14 @@ x = np.random.normal(size=(10,10))
 d = Dense(10, 5)
 y = d(x)
 print(y.shape)
+print(d.inputs)
 print(d.get_input_gradients()[0].shape)
 print(d.get_weight_gradients()[0].shape)
 print(d.get_weight_gradients()[1].shape)
-print(d.inputs.__len__())
+
+"""
+[]
+"""
 
 
 
