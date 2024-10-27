@@ -95,7 +95,7 @@ class Softmax(Activation):
         # raise NotImplementedError
         for i in range(bn):
             softmax_output = y[i]
-            jacobian = np.diagflat(softmax_output) - np.dot(softmax_output, softmax_output.T)
+            jacobian = np.diagflat(softmax_output) - np.outer(softmax_output, softmax_output.T)
             grad[i,:,:] = jacobian
         return [Tensor(grad)]
     

@@ -23,14 +23,18 @@ from beras.activations import *
 # print(d.get_weight_gradients()[0].shape)
 # print(d.get_weight_gradients()[1].shape)
 
-x = np.random.normal(size=(5,5))
-s = Softmax()
-sx = s(x)
-
-u,v = s.inputs + s.outputs
-
-print(u.__class__)
-
+x = np.array([[1,1,2],[1,1,2]])
+m = np.max(x, axis = -1, keepdims=True)
+x = x - m
+# print(np.sum(x, axis=-1, keepdims=True))
+softmax_output = x / np.sum(x, axis=-1, keepdims=True)
+print(softmax_output)
+print("_____________________")
+for i in range(softmax_output.shape[0]):
+    j = np.diagflat(softmax_output[i]) - np.outer(softmax_output[i], softmax_output[i].T)
+    print(j)
+# print(softmax_output)
+# print(sx)
 """
 []
 """
