@@ -57,7 +57,7 @@ class Model(Diffable):
         """
         Return the weights of the model by iterating through the layers
         """
-        return NotImplementedError
+        return [weight for layer in self.layers for weight in layer.weights]
 
     def compile(self, optimizer: Diffable, loss_fn: Diffable, acc_fn: Callable):
         """
@@ -74,7 +74,20 @@ class Model(Diffable):
         Trains the model by iterating over the input dataset and feeding input batches
         into the batch_step method with training. At the end, the metrics are returned.
         """
-        return NotImplementedError
+        # return NotImplementedError
+        step_per_epoch = (x.shape[0] + 1) // batch_size
+        for i in range(epochs):
+            super_dict = {"loss":[], "acc":[]}
+            for j in range(step_per_epoch):
+                start = j * batch_size
+                end = min(j * batch_size + batch_size, x.shape[0])
+                x_curr = x[start:end]
+                y_curr = y[start:end]
+                sub_dict = self.batch_step(x_curr, y_curr, training = True)
+                update_metric_dict(super_dict=super_dict, sub_dict=sub_dict)
+                print_stats(super_dict, j, step_per_epoch, i)
+            print_stats(stat_dict=super_dict, avg=True)
+
 
     def evaluate(self, x: Tensor, y: Union[Tensor, np.ndarray], batch_size: int):
         """
@@ -86,7 +99,22 @@ class Model(Diffable):
         NOTE: This method is almost identical to fit (think about how training and testing differ --
         the core logic should be the same)
         """
-        return NotImplementedError
+        step_per_epoch = (x.shape[0] + 1) // batch_size
+        super_dict = {"loss":[], "acc":[]}
+        pred = None
+        for j in range(step_per_epoch):
+            start = j * batch_size
+            end = min(j * batch_size + batch_size, x.shape[0])
+            x_curr = x[start:end]
+            y_curr = y[start:end]
+            sub_dict, predictions = self.batch_step(x_curr, y_curr, training = False)
+            update_metric_dict(super_dict=super_dict, sub_dict=sub_dict)
+            if pred == None:
+                pred = predictions
+            else:
+                pred = np.concatenate((pred, predictions), axis = 0)
+        print_stats(stat_dict=super_dict, avg=True)
+        return pred
 
     def get_input_gradients(self) -> list[Tensor]:
         return super().get_input_gradients()
@@ -103,12 +131,16 @@ class Model(Diffable):
         """
         raise NotImplementedError("batch_step method must be implemented in child class")
 
+        
 class SequentialModel(Model):
     def forward(self, inputs: Tensor) -> Tensor:
         """Forward pass in sequential model. It's helpful to note that layers are initialized in beras.Model, and
         you can refer to them with self.layers. You can call a layer by doing var = layer(input).
         """
-        return NotImplementedError
+        x = inputs
+        for layer in self.layers:
+            x = layer(x)
+        return x
 
     def batch_step(self, x:Tensor, y: Tensor, training: bool =True) -> dict[str, float]:
         """Computes loss and accuracy for a batch. This step consists of both a forward and backward pass.
@@ -116,8 +148,19 @@ class SequentialModel(Model):
         will take place within the scope of Beras.GradientTape()"""
         ## TODO: Compute loss and accuracy for a batch. Return as a dictionary
         ## If training, then also update the gradients according to the optimizer
-    
+        with GradientTape() as tape:
+            predictions = self.forward(x)
+            loss = self.compiled_loss(predictions, y)
+        acc = self.compiled_acc(predictions, y)
         if training:
-            return {"loss": ???, "acc": ???}
+            grads = tape.gradient(loss, self.weights)
+            # for grad, weight in zip(grads, self.weights):
+            #     if grad is None:
+            #         print(f"No gradient computed for weight with shape {weight.shape}")
+            #     else:
+            #         print(f"Gradient shape for weight {weight.shape}: {grad.shape}")
+            self.optimizer.apply_gradients(self.weights, grads)
+            return {"loss": loss, "acc": acc}
         else:
-            return {"loss": ???, "acc": ???}, predictions
+            return ({"loss": loss, "acc": acc}, predictions)
+

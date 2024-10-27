@@ -1,5 +1,4 @@
 import numpy as np
-
 from typing import Literal
 from beras.core import Diffable, Variable, Tensor
 
@@ -12,19 +11,23 @@ class Dense(Diffable):
 
     @property
     def weights(self) -> list[Tensor]:
-        return self.w, self.b
+        return [self.w, self.b]
 
     def forward(self, x: Tensor) -> Tensor:
         """
         Forward pass for a dense layer! Refer to lecture slides for how this is computed.
         """
-        return NotImplementedError
+        # return NotImplementedError
+        self.x = x
+        return self.x @ self.w + self.b
 
     def get_input_gradients(self) -> list[Tensor]:
-        return NotImplementedError
+        # return NotImplementedError
+        return [self.w]
 
     def get_weight_gradients(self) -> list[Tensor]:
-        return NotImplementedError
+        # return NotImplementedError
+        return [self.x.T, Tensor(np.array([1 for _ in range(len(self.b))]))]
 
     @staticmethod
     def _initialize_weight(initializer, input_size, output_size) -> tuple[Variable, Variable]:
@@ -54,7 +57,19 @@ class Dense(Diffable):
         ), f"Unknown dense weight initialization strategy '{initializer}' requested"
 
         # Change these!
-        weights = None
-        biases = None
+        if initializer == "zero":
+            weights = Variable(np.zeros((input_size, output_size)))
+            biases = Variable(np.zeros(output_size))
+        elif initializer == "normal":
+            weights = Variable(np.random.normal(0, 1, (input_size, output_size)))  # Standard deviation of 1
+            biases = Variable(np.zeros(output_size))
+        elif initializer == "xavier":
+            limit = np.sqrt(6 / (input_size + output_size))
+            weights = Variable(np.random.uniform(-limit, limit, (input_size, output_size)))
+            biases = Variable(np.zeros(output_size))
+        elif initializer == "kaiming":
+            std = np.sqrt(2 / input_size)
+            weights = Variable(np.random.normal(0, std, (input_size, output_size)))
+            biases = Variable(np.zeros(output_size))
+        return (weights, biases)
         
-        return weights, biases

@@ -1,6 +1,6 @@
 from types import SimpleNamespace
 from beras.activations import ReLU, LeakyReLU, Softmax
-from beras.layers import Dense, Dropout
+from beras.layers import Dense
 from beras.losses import CategoricalCrossEntropy, MeanSquaredError
 from beras.metrics import CategoricalAccuracy
 from beras.onehot import OneHotEncoder
@@ -11,4 +11,26 @@ import numpy as np
 from beras.model import SequentialModel
 
 if __name__ == '__main__':
+  path = "predictions.npy"
   # TODO, Train a model!
+  X_train, y_train, X_test, y_test = load_and_preprocess_data()
+  one_hot = OneHotEncoder()
+  y_train = one_hot(y_train)
+  y_test = one_hot(y_test)
+  model = SequentialModel(
+    [
+      Dense(input_size = 28*28, output_size = 512, initializer="xavier"),
+      LeakyReLU(),
+      Dense(input_size = 512, output_size = 512, initializer="xavier"),
+      LeakyReLU(),
+      Dense(input_size = 512, output_size = 10, initializer="xavier"),
+      Softmax()
+    ]
+  )
+  model.compile(
+    optimizer = Adam(0.001), loss_fn = CategoricalCrossEntropy(), acc_fn = CategoricalAccuracy()
+  )
+  model.fit(X_train, y_train, epochs=30, batch_size=128)
+  pred = model.evaluate(X_test, y_test)
+  pred = one_hot.inverse(pred)
+  np.save(path, pred)

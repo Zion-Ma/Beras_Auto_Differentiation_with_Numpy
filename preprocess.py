@@ -11,3 +11,9 @@ def load_and_preprocess_data() -> tuple[Tensor, Tensor, Tensor, Tensor]:
     
     #Load in the training and testing data from the MNIST dataset
     (train_inputs, train_labels), (test_inputs, test_labels) = datasets.mnist.load_data()
+    train_inputs = train_inputs / 255.0
+    test_inputs = test_inputs / 255.0
+    train_inputs = train_inputs.reshape(-1, 28 * 28)
+    test_inputs = test_inputs.reshape(-1, 28 * 28)
+    return(Tensor(train_inputs), Tensor(train_labels), Tensor(test_inputs), Tensor(test_labels))
+

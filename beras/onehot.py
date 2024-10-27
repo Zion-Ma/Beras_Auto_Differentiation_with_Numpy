@@ -23,10 +23,17 @@ class OneHotEncoder(Callable):
         :param data: 1D array containing labels.
             For example, data = [0, 1, 3, 3, 1, 9, ...]
         """
-        return NotImplementedError
+        # return NotImplementedError
+        feature_num = np.unique(data).shape[0]
+        one_hot = np.zeros(shape=(data.shape[0], feature_num))
+        for i in range(data.shape[0]):
+            one_hot[i, data[i]] = 1
+        return one_hot
 
     def forward(self, data):
-        return NotImplementedError
+        # return NotImplementedError
+        return self.fit(data)
 
     def inverse(self, data):
-        return NotImplementedError
+        # return NotImplementedError
+        return np.argmax(data, axis = -1)

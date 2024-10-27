@@ -1,22 +1,19 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 import numpy as np
- 
 from typing import TYPE_CHECKING, TypedDict, Dict, Union, Any, Optional, List, Iterable
 
 if TYPE_CHECKING:
     from beras.gradient_tape import GradientTape
-
 
 class Tensor(np.ndarray):
     """
     Essentially, a NumPy Array that can also be marked as trainable
     Custom Tensor class that mimics tf.Tensor. Allows the ability for a numpy array to be marked as trainable.
     """
-
     def __new__(cls, input_array):
         # Task 1: input the data to construct the object. 
-        obj = np.asarray(a=???).view(type=cls)
+        obj = np.asarray(a=input_array).view(type=cls)
         obj.trainable = True
         return obj
 
@@ -24,7 +21,6 @@ class Tensor(np.ndarray):
         if obj is None:
             return
         self.trainable = getattr(obj, "trainable", True)
-
 
 """
 Mimics the tf.Variable class.
@@ -36,7 +32,6 @@ class Callable(ABC):
     """
     Modules that can be called like functions.
     """
-
     def __call__(self, *args, **kwargs) -> Tensor:
         """
         Ensures `self()` and `self.forward()` be the same
@@ -67,22 +62,27 @@ class Weighted(ABC):
     @property
     def trainable_variables(self) -> list[Tensor]:
         """Collects all trainable variables in the module"""
-        return NotImplementedError
+        # return NotImplementedError
+        return [w for w in self.weights if w.trainable]
 
     @property
     def non_trainable_variables(self) -> list[Tensor]:
         """Collects all non-trainable variables in the module"""
-        return NotImplementedError
+        # return NotImplementedError
+        return [w for w in self.weights if not w.trainable]
 
     @property
     def trainable(self) -> bool:
         """Returns true if any of the weights are trainable"""
-        return NotImplementedError
+        # return NotImplementedError
+        return any(w.trainable for w in self.weights)
 
     @trainable.setter
     def trainable(self, trainable: bool):
         """Sets the trainable status of all weights to trainable"""
-        pass 
+        for w in self.weights:
+            w.trainable = trainable
+        # pass 
 
 
 class Diffable(Callable, Weighted):
@@ -111,39 +111,29 @@ class Diffable(Callable, Weighted):
                     Assign the output value's previous_layer field to be this diffable layer
                 4. Return the output value(s)
         """
-
         """Start Task 1: Collect all the input values and their variable names"""
-
         # This line grabs the variable names that are passed to the call function, ingores self
         self.argnames = self.forward.__code__.co_varnames[1:]
-
         # Assigns the values passed in to the argnames we just grabbed
         ##  It's helpful to think of this line as a dictionary turning the unnamed "args" into named "kwargs"
         named_args = {self.argnames[i]: args[i] for i in range(len(args))}
-
         # Combines the unnamed args with the named args
         self.input_dict = {**named_args, **kwargs}
-
         # Grabs the input values of all passed args/kwargs from the constucted input dictionary
         self.inputs = [
             self.input_dict[arg]
             for arg in self.argnames
             if arg in self.input_dict.keys()
         ]
-
         """End Task 1. and start Task 2: Call the forward function with the input values"""
-
         # Calls the forward function with the input values
         self.outputs = self.forward(*args, **kwargs)
-
         """End Task 2. and start Task 3: If we should be recording gradients,
                                         Assign the output value's previous_layer field to be this diffable layer"""
-
         ## If there is only one output, make it a list so we can iterate over it
         list_outs = isinstance(self.outputs, list) or isinstance(self.outputs, tuple)
         if not list_outs:
             self.outputs = [self.outputs]
-
         ## Check if there is a gradient tape scope in effect
         if Diffable.gradient_tape is not None:
             # Go through each output and add this layer to the previous layers dictionary
@@ -151,10 +141,8 @@ class Diffable(Callable, Weighted):
                 # id(<object>) returns the memory address of the object,
                 #   which is used as the key in the previous_layers dictionary
                 Diffable.gradient_tape.previous_layers[id(out)] = self
-
         """End Task 3. and start Task 4: Return the output value(s)"""
         return self.outputs if list_outs else self.outputs[0]
-
     @abstractmethod
     def get_input_gradients(self) -> list[Tensor]:
         """
@@ -163,7 +151,6 @@ class Diffable(Callable, Weighted):
             list of gradients with respect to the inputs
         """
         return []
-
     @abstractmethod
     def get_weight_gradients(self) -> list[Tensor]:
         """
@@ -172,7 +159,6 @@ class Diffable(Callable, Weighted):
             list of gradients with respect to the weights
         """
         return []
-
     def compose_input_gradients(self, J: Iterable = None):
         """
         Compose the inputted cumulative jacobian with the input jacobian for the layer.
@@ -208,7 +194,6 @@ class Diffable(Callable, Weighted):
                 J_out += [j_wrt_lay_inp]
         # Returns cumulative jacobians w.r.t to all inputs.
         return J_out
-
     def compose_weight_gradients(self, J: Iterable = None) -> list[Tensor]:
         """
         Compose the inputted cumulative jacobian with the weight jacobian for the layer.
