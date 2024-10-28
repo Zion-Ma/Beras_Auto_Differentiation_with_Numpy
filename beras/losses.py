@@ -26,7 +26,7 @@ class MeanSquaredError(Loss):
         example_means = np.mean(squared_diff, axis=-1)
 
         # Then take the mean across the batch
-        batch_mean = np.mean(example_means, keepdims=True)
+        batch_mean = np.mean(example_means, axis = -1)
         
 
         return Tensor(np.mean(batch_mean))
