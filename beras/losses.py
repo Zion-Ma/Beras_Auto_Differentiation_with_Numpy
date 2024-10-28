@@ -57,8 +57,6 @@ class CategoricalCrossEntropy(Loss):
         y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
         y_pred = y_pred.reshape(-1, y_pred.shape[-1])
         y_true = y_true.reshape(-1, y_true.shape[-1])
-        self.y_true = y_true
-        self.y_pred = y_pred
         # loss = np.mean(-np.sum(y_true * np.log(y_pred), axis=-1), keepdims=True)
         loss = np.sum(-np.sum(y_true * np.log(y_pred), axis=-1)) / y_pred.shape[0]
         return Tensor(loss)
@@ -68,7 +66,7 @@ class CategoricalCrossEntropy(Loss):
         # return NotImplementedError
         y_pred = self.inputs[0]
         y_true = self.inputs[1]
-        grad = y_pred - y_true
+        grad = -(y_true / y_pred) 
         # grad = (1 / self.y_pred.shape[0]) * -(self.y_true * self.y_pred)
         # grad_y_true =  np.zeros_like(self.y_true)
         return [Tensor(grad), Tensor(np.zeros_like(y_true))]
