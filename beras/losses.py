@@ -25,7 +25,7 @@ class MeanSquaredError(Loss):
         self.y_true = y_true
         return 0.5*np.sum((y_pred-y_true)**2)/y_pred.shape[0]
     def get_input_gradients(self) -> list[Tensor]:
-        return (self.y_pred-self.y_true)/np.prod(self.y_pred.shape[:-1])
+        return [(self.y_pred-self.y_true)/np.prod(self.y_pred.shape[:-1])]
     # def forward(self, y_pred: Tensor, y_true: Tensor) -> Tensor:
         # # return NotImplementedError
         # self.y_pred = y_pred
