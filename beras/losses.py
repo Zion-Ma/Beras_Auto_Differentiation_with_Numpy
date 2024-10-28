@@ -23,13 +23,13 @@ class MeanSquaredError(Loss):
         squared_diff = (y_pred - y_true) ** 2
 
         # Take the mean across each example (axis=-1)
-        example_means = np.mean(squared_diff, axis=-1)
+        example_means = np.mean(squared_diff, axis=-1, keepdims=True)
 
         # Then take the mean across the batch
-        batch_mean = np.mean(example_means, axis = -1)
+        batch_mean = np.mean(example_means, axis = -1, keepdims=True)
         
 
-        return Tensor(np.mean(batch_mean))
+        return Tensor(batch_mean)
         # # mse = np.mean(np.mean(np.square(y_pred - y_true), axis=-1), keepdims=True)
         # mse = np.mean(np.square(y_pred-y_true), axis=0)
         # return Tensor(mse)
