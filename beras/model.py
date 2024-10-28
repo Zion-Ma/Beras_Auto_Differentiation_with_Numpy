@@ -153,13 +153,14 @@ class SequentialModel(Model):
             loss = self.compiled_loss(predictions, y)
         acc = self.compiled_acc(predictions, y)
         if training:
-            grads = tape.gradient(loss, self.weights)
+            grads = tape.gradient(loss, self.trainable_variables)
             # for grad, weight in zip(grads, self.weights):
             #     if grad is None:
             #         print(f"No gradient computed for weight with shape {weight.shape}")
             #     else:
             #         print(f"Gradient shape for weight {weight.shape}: {grad.shape}")
-            self.optimizer.apply_gradients(self.weights, grads)
+            print("gradient", grads)
+            self.optimizer.apply_gradients(self.trainable_variables, grads)
             return {"loss": loss, "acc": acc}
         else:
             return ({"loss": loss, "acc": acc}, predictions)

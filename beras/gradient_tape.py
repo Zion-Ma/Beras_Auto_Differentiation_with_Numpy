@@ -36,11 +36,14 @@ class GradientTape:
         while queue:
             curr = queue.pop(0)
             prev = self.previous_layers[id(curr)]
+            # print(prev.__class__)
             if prev is None:
                 continue
             weight_grad = prev.compose_weight_gradients(grads[id(curr)])
             # print("grad:", grads[id(curr)])
             input_grad = prev.compose_input_gradients(grads[id(curr)])
+            print("weight grad:", weight_grad)
+            print("input grad:", input_grad)
             for weight, grad in zip(prev.trainable_variables, weight_grad):
                 grads[(id(weight))] = [grad] if grads[id(weight)] is None else grads[(id(weight))] + [grad]
             for inputs, grad in zip(prev.inputs, input_grad):

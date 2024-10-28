@@ -17,6 +17,7 @@ if __name__ == '__main__':
   one_hot = OneHotEncoder()
   y_train = one_hot(y_train)
   y_test = one_hot(y_test)
+  # print(X_train.shape, y_train.shape, X_test.shape, y_test.shape)
   model = SequentialModel(
     [
       Dense(input_size = 28*28, output_size = 512, initializer="xavier"),
