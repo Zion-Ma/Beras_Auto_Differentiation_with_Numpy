@@ -45,6 +45,7 @@ class CategoricalCrossEntropy(Loss):
         grad = -(y_true / y_pred) 
         # grad = (1 / self.y_pred.shape[0]) * -(self.y_true * self.y_pred)
         # grad_y_true =  np.zeros_like(self.y_true)
-        return [Tensor(np.expand_dims(grad, axis=-1)), Tensor(np.zeros_like(np.expand_dims(y_true, axis=-1)))]
+        return [Tensor(grad), Tensor(np.zeros_like(grad))]
+     # (128, 10) (128, 10)
 
 

@@ -31,7 +31,7 @@ class GradientTape:
         # {id(tensor): [gradient]}
         # What tensor and what gradient is for you to implement!
         # compose_input_gradients and compose_weight_gradients are methods that will be helpful
-        grads[id(target)] = [np.ones_like(target)]
+        # grads[id(target)] = [np.ones_like(target)]
         gradient_list = []
         while queue:
             curr = queue.pop(0)
