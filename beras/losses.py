@@ -58,9 +58,12 @@ class CategoricalCrossEntropy(Loss):
         # return NotImplementedError
         epsilon = 1e-15
         y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
+        y_pred = y_pred.reshape(-1, y_pred[-1])
+        y_true = y_true.reshape(-1, y_true[-1])
         self.y_true = y_true
         self.y_pred = y_pred
-        loss = np.mean(np.mean(-np.sum(y_true * np.log(y_pred), axis=-1), keepdims=True), keepdims=True)
+        # loss = np.mean(-np.sum(y_true * np.log(y_pred), axis=-1), keepdims=True)
+        loss = np.mean(-np.sum(y_true * np.log(y_pred), axis=-1))
         return Tensor(loss)
         
     def get_input_gradients(self):
