@@ -16,28 +16,39 @@ class Loss(Diffable):
 
 class MeanSquaredError(Loss):
     def forward(self, y_pred: Tensor, y_true: Tensor) -> Tensor:
-        # # return NotImplementedError
+        assert(y_pred.shape == y_true.shape)
+        y_pred = np.atleast_2d(y_pred)
+        y_true = np.atleast_2d(y_true)
+        y_pred = y_pred.reshape(-1, y_pred.shape[-1])
+        y_true = y_true.reshape(-1, y_true.shape[-1])
         self.y_pred = y_pred
         self.y_true = y_true
-                # Compute the squared difference
-        squared_diff = (y_pred - y_true) ** 2
+        return 0.5*np.sum((y_pred-y_true)**2)/y_pred.shape[0]
+    def get_input_gradients(self) -> list[Tensor]:
+        return (self.y_pred-self.y_true)/np.prod(self.y_pred.shape[:-1])
+    # def forward(self, y_pred: Tensor, y_true: Tensor) -> Tensor:
+        # # return NotImplementedError
+        # self.y_pred = y_pred
+        # self.y_true = y_true
+        #         # Compute the squared difference
+        # squared_diff = (y_pred - y_true) ** 2
 
-        # Take the mean across each example (axis=-1)
-        example_means = np.mean(squared_diff, axis=-1, keepdims=True)
+        # # Take the mean across each example (axis=-1)
+        # example_means = np.mean(squared_diff, axis=-1, keepdims=True)
 
-        # # Then take the mean across the batch
-        batch_mean = np.mean(example_means, axis = -1, keepdims=True) / 2
+        # # # Then take the mean across the batch
+        # batch_mean = np.mean(example_means, axis = -1, keepdims=True) / 2
         
-        return Tensor(batch_mean)
+        # return Tensor(batch_mean)
         # # mse = np.mean(np.mean(np.square(y_pred - y_true), axis=-1), keepdims=True)
         # mse = np.mean(np.square(y_pred-y_true), axis=0)
         # return Tensor(mse)
 
-    def get_input_gradients(self) -> list[Tensor]:
-        # return NotImplementedError
-        grad = (2 / self.y_pred.shape[0]) * (self.y_pred - self.y_true)
-        # grad_y_true =  np.zeros_like(self.y_true)
-        return [Tensor(grad)]
+    # def get_input_gradients(self) -> list[Tensor]:
+    #     # return NotImplementedError
+    #     grad = (2 / self.y_pred.shape[0]) * (self.y_pred - self.y_true)
+    #     # grad_y_true =  np.zeros_like(self.y_true)
+    #     return [Tensor(grad)]
 
 
 class CategoricalCrossEntropy(Loss):
