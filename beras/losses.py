@@ -69,7 +69,8 @@ class CategoricalCrossEntropy(Loss):
     def get_input_gradients(self):
         """Categorical cross entropy input gradient method!"""
         # return NotImplementedError
-        grad = (1 / self.y_pred.shape[0]) * (self.y_pred - self.y_true)
+        grad = self.y_pred - self.y_true
+        # grad = (1 / self.y_pred.shape[0]) * -(self.y_true * self.y_pred)
         # grad_y_true =  np.zeros_like(self.y_true)
         return [Tensor(grad)]
 
