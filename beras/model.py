@@ -5,7 +5,6 @@ from typing import Union
 from beras.core import Diffable, Tensor, Callable
 from beras.gradient_tape import GradientTape
 import numpy as np
-from tqdm import tqdm
 
 def print_stats(stat_dict:dict, batch_num=None, num_batches=None, epoch=None, avg=False):
     """
@@ -76,17 +75,17 @@ class Model(Diffable):
         into the batch_step method with training. At the end, the metrics are returned.
         """
         # return NotImplementedError
-        step_per_epoch = (x.shape[0] + 1) // batch_size 
+        step_per_epoch = (x.shape[0] + 1) // batch_size
         for i in range(epochs):
             super_dict = {"loss":[], "acc":[]}
-            for j in tqdm(range(step_per_epoch)):
+            for j in range(step_per_epoch):
                 start = j * batch_size
                 end = min(j * batch_size + batch_size, x.shape[0])
                 x_curr = x[start:end]
                 y_curr = y[start:end]
                 sub_dict = self.batch_step(x_curr, y_curr, training = True)
                 update_metric_dict(super_dict=super_dict, sub_dict=sub_dict)
-                # print_stats(super_dict, j, step_per_epoch, i)
+                print_stats(super_dict, j, step_per_epoch, i)
             print_stats(stat_dict=super_dict, avg=True)
 
 
@@ -100,7 +99,7 @@ class Model(Diffable):
         NOTE: This method is almost identical to fit (think about how training and testing differ --
         the core logic should be the same)
         """
-        step_per_epoch = (x.shape[0] + 1) // batch_size 
+        step_per_epoch = (x.shape[0] + 1) // batch_size
         super_dict = {"loss":[], "acc":[]}
         pred = None
         for j in range(step_per_epoch):
@@ -159,12 +158,8 @@ class SequentialModel(Model):
             #     if grad is None:
             #         print(f"No gradient computed for weight with shape {weight.shape}")
             #     else:
-            #         print(f"Gradient shape for weight {weight.shape}: {grad.shape}")   
-            train_var = self.trainable_variables  
+            #         print(f"Gradient shape for weight {weight.shape}: {grad.shape}")
             self.optimizer.apply_gradients(self.trainable_variables, grads)
-            train_var_new = self.trainable_variables
-            if np.array_equal(np.array(train_var), np.array(train_var_new)):
-                print("nothing being updated!!!")
             return {"loss": loss, "acc": acc}
         else:
             return ({"loss": loss, "acc": acc}, predictions)
