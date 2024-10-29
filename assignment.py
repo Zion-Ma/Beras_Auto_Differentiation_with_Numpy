@@ -31,7 +31,7 @@ if __name__ == '__main__':
   model.compile(
     optimizer = Adam(0.001), loss_fn = CategoricalCrossEntropy(), acc_fn = CategoricalAccuracy()
   )
-  model.fit(X_train, y_train, epochs=30, batch_size=128)
+  model.fit(X_train, y_train, epochs=10, batch_size=128)
   pred = model.evaluate(X_test, y_test)
   pred = one_hot.inverse(pred)
   np.save(path, pred)

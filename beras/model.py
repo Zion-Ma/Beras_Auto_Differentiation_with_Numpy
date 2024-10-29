@@ -158,9 +158,7 @@ class SequentialModel(Model):
             #     if grad is None:
             #         print(f"No gradient computed for weight with shape {weight.shape}")
             #     else:
-            #         print(f"Gradient shape for weight {weight.shape}: {grad.shape}")
-            print("gradient:", grads)
-            
+            #         print(f"Gradient shape for weight {weight.shape}: {grad.shape}")     
             self.optimizer.apply_gradients(self.trainable_variables, grads)
             return {"loss": loss, "acc": acc}
         else:
