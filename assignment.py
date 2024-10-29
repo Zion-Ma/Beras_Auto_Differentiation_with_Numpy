@@ -14,11 +14,6 @@ if __name__ == '__main__':
   path = "predictions_.npy"
   # TODO, Train a model!
   X_train, y_train, X_test, y_test = load_and_preprocess_data()
-  print(X_train.shape)
-  # X_train = np.random.shuffle(X_train)
-  # rng = np.random.default_rng()
-  # rng.shuffle(X_train)
-  print(X_train.shape)
   one_hot = OneHotEncoder()
   y_train = one_hot(y_train)
   y_test = one_hot(y_test)
@@ -37,7 +32,8 @@ if __name__ == '__main__':
   model.compile(
     optimizer = Adam(0.001), loss_fn = CategoricalCrossEntropy(), acc_fn = CategoricalAccuracy()
   )
-  model.fit(X_train, y_train, epochs=10, batch_size=128)
+  model.fit(X_train, y_train, epochs=5, batch_size=128)
   pred = model.evaluate(X_test, y_test, batch_size=128)
+  print(pred.shape)
   pred = one_hot.inverse(pred)
   np.save(path, pred)

@@ -41,7 +41,7 @@ class Adam:
             self.v[i] = self.beta_2 * self.v[i] + (1 - self.beta_2) * np.square(grads[i])
             m_ = self.m[i] / (1 - (self.beta_1 ** self.t))
             v_ = self.v[i] / (1 - (self.beta_2 ** self.t))
-            trainable_params[i] = trainable_params[i] - (self.learning_rate * m_) / (np.sqrt(v_) + self.epsilon)
+            trainable_params[i] -= (self.learning_rate * m_) / (np.sqrt(v_) + self.epsilon)
         
 
 

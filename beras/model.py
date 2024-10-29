@@ -5,6 +5,7 @@ from typing import Union
 from beras.core import Diffable, Tensor, Callable
 from beras.gradient_tape import GradientTape
 import numpy as np
+from tqdm import tqdm
 
 def print_stats(stat_dict:dict, batch_num=None, num_batches=None, epoch=None, avg=False):
     """
@@ -75,10 +76,10 @@ class Model(Diffable):
         into the batch_step method with training. At the end, the metrics are returned.
         """
         # return NotImplementedError
-        step_per_epoch = (x.shape[0] - batch_size + 1) // batch_size
+        step_per_epoch = (x.shape[0] + batch_size - 1) // batch_size
         for _ in range(epochs):
             super_dict = {"loss":[], "acc":[]}
-            for j in range(step_per_epoch):
+            for j in tqdm(range(step_per_epoch)):
                 start = j * batch_size
                 end = min(j * batch_size + batch_size, x.shape[0])
                 x_curr = x[start:end]
@@ -99,17 +100,17 @@ class Model(Diffable):
         the core logic should be the same)
         """
         # step_per_epoch = (x.shape[0] + 1) // batch_size
-        step_per_epoch = (x.shape[0] - batch_size + 1) // batch_size
+        step_per_epoch = (x.shape[0] + batch_size - 1) // batch_size
         super_dict = {"loss":[], "acc":[]}
         pred = None
-        for j in range(step_per_epoch):
+        for j in tqdm(range(step_per_epoch)):
             start = j * batch_size
             end = min(j * batch_size + batch_size, x.shape[0])
             x_curr = x[start:end]
             y_curr = y[start:end]
             sub_dict, predictions = self.batch_step(x_curr, y_curr, training = False)
             update_metric_dict(super_dict=super_dict, sub_dict=sub_dict)
-            if pred == None:
+            if pred is None:
                 pred = predictions
             else:
                 pred = np.concatenate((pred, predictions), axis = 0)
