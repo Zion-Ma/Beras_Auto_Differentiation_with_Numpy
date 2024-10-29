@@ -44,23 +44,24 @@ class GradientTape:
             for weight, grad in zip(prev.trainable_variables, weight_grad):
                 queue.append(weight)
                 if grads[id(weight)] is None:
-                    grads[(id(weight))] = [grad]
+                    grads[id(weight)] = [grad]
                 else:
-                    grads[(id(weight))] += [grad]
+                    grads[id(weight)][0] += grad
             for inputs, grad in zip(prev.inputs, input_grad):
                 # if id(inputs) not in queue:
                 #     queue.append(inputs)
                 queue.append(inputs)
                 # grads[(id(inputs))] = [grad] if grads[id(inputs)] is None else grads[(id(inputs))] + [grad]
                 if grads[id(inputs)] is None:
-                    grads[(id(inputs))] = [grad]
+                    grads[id(inputs)] = [grad]
                 else:
-                    grads[(id(inputs))] = grads[(id(inputs))] + [grad]
+                    grads[id(inputs)][0] += grad
         for source in sources:
             # gradient_list.append(grads[id(source)][0])
-            if grads[id(source)] is not None:
-                gradient_list.append(Tensor.sum(grads[id(source)], axis = 0))
-            else:
-                gradient_list.append("---")
+            # if grads[id(source)] is not None:
+            # gradient_list.append(Tensor.sum(np.array(grads[id(source)]), axis = 0))
+            gradient_list.append(grads[id(source)])
+            # else:
+            #     gradient_list.append(None)
             # gradient_list.append(Tensor.sum(grads[id(source)], axis = 0))
         return gradient_list

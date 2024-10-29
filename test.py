@@ -34,8 +34,8 @@ m = CategoricalCrossEntropy()
 """
 
 x = np.random.normal(size=(128,10))
-y = np.random.normal(size=(1,))
-print(x @ y)
+y = np.random.normal(size=(128,5))
+print(x + y)
 
 
 

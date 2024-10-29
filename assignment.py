@@ -11,20 +11,26 @@ import numpy as np
 from beras.model import SequentialModel
 
 if __name__ == '__main__':
-  path = "predictions.npy"
+  path = "predictions_.npy"
   # TODO, Train a model!
   X_train, y_train, X_test, y_test = load_and_preprocess_data()
+  print(X_train.shape)
+  # X_train = np.random.shuffle(X_train)
+  rng = np.random.default_rng()
+  rng.shuffle(X_train)
+  print(X_train.shape)
   one_hot = OneHotEncoder()
   y_train = one_hot(y_train)
   y_test = one_hot(y_test)
+  layer_output_size = 128
   # print(X_train.shape, y_train.shape, X_test.shape, y_test.shape)
   model = SequentialModel(
     [
-      Dense(input_size = 28*28, output_size = 512, initializer="xavier"),
-      LeakyReLU(),
-      Dense(input_size = 512, output_size = 512, initializer="xavier"),
-      LeakyReLU(),
-      Dense(input_size = 512, output_size = 10, initializer="xavier"),
+      Dense(input_size = 28*28, output_size = layer_output_size, initializer="xavier"),
+      ReLU(),
+      Dense(input_size = layer_output_size, output_size = layer_output_size, initializer="xavier"),
+      ReLU(),
+      Dense(input_size = layer_output_size, output_size = 10, initializer="xavier"),
       Softmax()
     ]
   )
