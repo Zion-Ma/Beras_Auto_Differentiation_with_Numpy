@@ -76,7 +76,7 @@ class Model(Diffable):
         into the batch_step method with training. At the end, the metrics are returned.
         """
         # return NotImplementedError
-        step_per_epoch = (x.shape[0] + 1) // batch_size + (1 if x.shape[0] % batch_size else 0)
+        step_per_epoch = (x.shape[0] + 1) // batch_size 
         for i in range(epochs):
             super_dict = {"loss":[], "acc":[]}
             for j in tqdm(range(step_per_epoch)):
@@ -100,7 +100,7 @@ class Model(Diffable):
         NOTE: This method is almost identical to fit (think about how training and testing differ --
         the core logic should be the same)
         """
-        step_per_epoch = (x.shape[0]) // batch_size + (1 if x.shape[0] % batch_size else 0)
+        step_per_epoch = ((x.shape[0]) + batch_size - 1) // batch_size
         super_dict = {"loss":[], "acc":[]}
         pred = None
         for j in range(step_per_epoch):

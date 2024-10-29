@@ -60,7 +60,7 @@ class GradientTape:
             # gradient_list.append(grads[id(source)][0])
             # if grads[id(source)] is not None:
             # gradient_list.append(Tensor.sum(np.array(grads[id(source)]), axis = 0))
-            gradient_list.append(grads[id(source)])
+            gradient_list.append(grads[id(source)][0])
             # else:
             #     gradient_list.append(None)
             # gradient_list.append(Tensor.sum(grads[id(source)], axis = 0))
