@@ -76,7 +76,7 @@ class Model(Diffable):
         """
         # return NotImplementedError
         step_per_epoch = (x.shape[0] - batch_size + 1) // batch_size
-        for i in range(epochs):
+        for _ in range(epochs):
             super_dict = {"loss":[], "acc":[]}
             for j in range(step_per_epoch):
                 start = j * batch_size
@@ -85,7 +85,6 @@ class Model(Diffable):
                 y_curr = y[start:end]
                 sub_dict = self.batch_step(x_curr, y_curr, training = True)
                 update_metric_dict(super_dict=super_dict, sub_dict=sub_dict)
-                print_stats(super_dict, j, step_per_epoch, i)
             print_stats(stat_dict=super_dict, avg=True)
 
 
